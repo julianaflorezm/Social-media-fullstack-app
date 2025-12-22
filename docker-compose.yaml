@@ -1,48 +1,14 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  postgres:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_DB: PeriferiaSocial
-      POSTGRES_USER: PeriferiaSocial
-      POSTGRES_PASSWORD: PeriferiaSocialPass
-    ports:
-      - "2345:5432"
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U PeriferiaSocial -d PeriferiaSocial"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
-
-  backend:
+  frontend:
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
-    environment:
-      PORT: 8080
-      DATABASE_TYPE: postgres
-      DATABASE_HOST: postgres
-      DATABASE_PORT: 5432
-      DATABASE_USER: PeriferiaSocial
-      DATABASE_PASSWORD: PeriferiaSocialPass
-      DATABASE_NAME: PeriferiaSocial
-      BASE_URL: http://localhost:8080/
-      TYPEORM_ENTITIES_DIR: dist/**/*.entity{.ts,.js}
     ports:
-      - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
+      - "5173:5173"
     volumes:
-      - ./:/app
+      - .:/app
       - /app/node_modules
-      - uploads:/app/uploads
-    command: npm run start:dev
-
-volumes:
-  uploads:
+    command: npm run dev -- --host 0.0.0.0 --port 5173

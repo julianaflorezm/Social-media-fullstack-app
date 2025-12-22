@@ -21,7 +21,7 @@ export default function CreatePostCard({ onCreate }) {
     try {
       if (type === PostType.TEXT) {
         await onCreate({
-          authorId: localStorage.getItem('user_id'),
+          authorId: Number(localStorage.getItem('user_id')),
           type: PostType.TEXT,
           textContent: textContent.trim(),
           caption: caption.trim() || null,
@@ -30,7 +30,7 @@ export default function CreatePostCard({ onCreate }) {
         setCaption("");
       } else {
         await onCreate({
-          authorId: localStorage.getItem('user_id'),
+          authorId: Number(localStorage.getItem('user_id')),
           type: PostType.IMAGE,
           source: source,
           caption: caption.trim() || '',
@@ -39,9 +39,7 @@ export default function CreatePostCard({ onCreate }) {
         setCaption("");
         setSource(null);
       }
-    } catch (err) {
-      console.log('err',err);
-      
+    } catch (err) {      
       setError(err?.message || "Error creando el post");
     } finally {
       setSubmitting(false);
