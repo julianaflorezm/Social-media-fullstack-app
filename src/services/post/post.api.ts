@@ -3,7 +3,7 @@ import { CreatePostPayload, PostType } from "./post";
 const API = "http://localhost:8080";
 
 function getToken() {
-  return localStorage.getItem("token"); // si guardas jwt
+  return localStorage.getItem("access_token"); // si guardas jwt
 }
 
 export async function getPosts() {

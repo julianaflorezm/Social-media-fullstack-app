@@ -6,6 +6,7 @@ import Login from "./pages/login/Login.jsx";
 import Dashboard from "./pages/dashboard/dashboard.jsx";
 import "./index.css";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Profile from './pages/profile/Profile.jsx';
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
                               }/>
 
         {/* Ruta por defecto */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

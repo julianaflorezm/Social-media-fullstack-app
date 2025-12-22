@@ -99,10 +99,7 @@ export default function CreatePostCard({ onCreate }) {
               style={styles.input}
             />
           </div>
-          
         )}
-
-        
 
         {error && <div style={styles.error}>{error}</div>}
 

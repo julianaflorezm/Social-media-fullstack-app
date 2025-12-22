@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../../services/auth/auth.api";
+import { createUser } from "../../services/user/user.api";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.trim() || "http://localhost:8080";
@@ -21,6 +23,7 @@ export default function Login() {
   const [regName, setRegName] = useState('')
   const [regLastname, setRegLastname] = useState('')
   const [regAlias, setRegAlias] = useState('')
+  const [regBirthdate, setRegBirthdate] = useState(new Date())
   const [regPassword, setRegPassword] = useState("");
   const [regConfirm, setRegConfirm] = useState("");
   const [regError, setRegError] = useState("");
@@ -62,24 +65,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
-
-      if (!res.ok) {
-        let message = "Credenciales inválidas.";
-        try {
-          const data = await res.json();
-          message = Array.isArray(data?.message)
-            ? data.message.join(", ")
-            : data?.message ?? message;
-        } catch (_) {}
-        throw new Error(message);
-      }
-
-      const data = await res.json();
+      const data = await login({ password, email })
       const token = getTokenFromResponse(data);
 
       if (!token) {
@@ -117,32 +103,14 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/users`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: regEmail.trim(),
-          name: regName,
-          lastname: regLastname,
-          alias: regAlias,
-          password: regPassword,
-          roleId: 2
-        }),
-      });
-
-      if (!res.ok) {
-        let message = "No se pudo registrar.";
-        setRegError(message);
-        try {
-          const data = await res.json();
-          message = Array.isArray(data?.message)
-            ? data.message.join(", ")
-            : data?.message ?? message;
-        } catch (_) {}
-        throw new Error(message);
-      }
-
-      const data = await res.json();
+      const data = await createUser({
+        regEmail,
+        regName,
+        regLastname,
+        regAlias,
+        regBirthdate,
+        regPassword
+      })
       const token = getTokenFromResponse(data);
 
       // Si tu register NO devuelve token, te dejo fallback:
@@ -290,6 +258,18 @@ export default function Login() {
                   required
                 />
               </label>
+              <label style={styles.label}>
+                Fecha de nacimiento
+                <input
+                  type="date"
+                  value={regBirthdate}
+                  onChange={(e) => setRegBirthdate(e.target.value)}
+                  style={styles.input}
+                  disabled={loading}
+                  required
+                />
+              </label>
+
               <label style={styles.label}>
                 Email
                 <input

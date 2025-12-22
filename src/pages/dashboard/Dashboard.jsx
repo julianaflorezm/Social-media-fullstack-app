@@ -2,10 +2,19 @@ import { useEffect, useState } from "react";
 import CreatePostCard from "../createPostCard/CreatePostCard";
 import PostList from "../PostList/PostList";
 import { getPosts, createPost } from "../../services/post/post.api";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
 
   const load = async () => {
     setLoading(true);
@@ -22,7 +31,6 @@ export default function Dashboard() {
   }, []);
 
   const handleCreate = async (payload) => {
-    console.log('payload', payload); 
     const created = await createPost(payload);
     setPosts((prev) => [created, ...prev]);
   };
@@ -32,6 +40,29 @@ export default function Dashboard() {
       <div style={styles.container}>
         <h2 style={styles.title}>Publicaciones</h2>
 
+        <div style={styles.avatarWrapper}>
+          <div
+            style={styles.avatar}
+            onClick={() => setOpen((v) => !v)}
+            title="Cuenta"
+          >
+            👤
+          </div>
+
+          {open && (
+            <div style={styles.dropdown}>
+              <div style={styles.item} onClick={() => navigate("/profile")}>
+                👤 Mi perfil
+              </div>
+              <div
+                style={{ ...styles.item, color: "#f87171" }}
+                onClick={logout}
+              >
+                🚪 Cerrar sesión
+              </div>
+            </div>
+          )}
+        </div>
         <CreatePostCard onCreate={handleCreate} />
 
         <div style={{ height: 16 }} />
@@ -47,126 +78,67 @@ export default function Dashboard() {
 }
 
 const styles = {
-  /* ====== PÁGINA ====== */
   page: {
     minHeight: "100vh",
-    background:
-      "radial-gradient(circle at top, #0b1220 0%, #060b14 60%, #050812 100%)",
+    background: "radial-gradient(circle at top, #0b1220 0%, #060b14 60%, #050812 100%)",
     padding: "28px 16px",
   },
 
-  container: {
-    maxWidth: 860,
-    margin: "0 auto",
-  },
+  container: { maxWidth: 860, margin: "0 auto" },
 
-  title: {
-    color: "white",
-    marginBottom: 14,
-    fontSize: 22,
-    fontWeight: 700,
-    textAlign: "center",
-  },
-
-  /* ====== CARD PUBLICAR ====== */
-  card: {
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 18,
-    padding: 16,
-    color: "white",
-    backdropFilter: "blur(8px)",
-    overflow: "hidden", // 🔑 evita que se salga contenido
-  },
-
+  // ✅ header “full width” pero dentro del maxWidth, con avatar absoluto a la derecha
   header: {
+    maxWidth: 860,
+    margin: "0 auto 18px",
+    position: "relative",
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "center", // centra el título
     alignItems: "center",
-    marginBottom: 12,
+    minHeight: 48,
   },
 
-  hTitle: {
-    fontWeight: 700,
-    fontSize: 16,
+  // ✅ título centrado real
+  title: { color: "white", fontSize: 22, fontWeight: 700, margin: 0 },
+
+  // ✅ avatar queda SIEMPRE arriba derecha del header
+  avatarWrapper: {
+    position: "absolute",
+    right: 0,
+    top: "50%",
+    transform: "translateY(-50%)",
   },
 
-  tabs: {
+  avatar: {
+    width: 38,
+    height: 38,
+    borderRadius: "50%",
+    background: "linear-gradient(135deg, #e5e7eb, #e5e7eb)",
     display: "flex",
-    gap: 8,
-  },
-
-  tab: {
-    background: "transparent",
-    border: "1px solid rgba(255,255,255,0.2)",
-    color: "#cbd5e1",
-    padding: "6px 10px",
-    borderRadius: 10,
-    cursor: "pointer",
-  },
-
-  tabActive: {
-    background: "rgba(59,130,246,0.25)",
-    border: "1px solid rgba(59,130,246,0.8)",
+    alignItems: "center",
+    justifyContent: "center",
     color: "white",
-    padding: "6px 10px",
-    borderRadius: 10,
+    
     cursor: "pointer",
+    userSelect: "none",
   },
 
-  /* ====== INPUTS ====== */
-  textarea: {
-    width: "100%",
-    maxWidth: "100%",
-    minHeight: 120,
+  dropdown: {
+    position: "absolute",
+    top: 46,
+    right: 0,
+    background: "rgba(15,23,42,0.95)",
+    border: "1px solid rgba(255,255,255,0.12)",
     borderRadius: 12,
-    padding: "12px 14px",
-    resize: "vertical",
-    border: "1px solid rgba(255,255,255,0.15)",
-    background: "rgba(3,7,18,0.6)",
-    color: "white",
-    outline: "none",
-    marginBottom: 12,
+    overflow: "hidden",
+    minWidth: 160,
+    zIndex: 10,
+  },
+
+  item: {
+    padding: "10px 14px",
+    cursor: "pointer",
+    color: "#e5e7eb",
     fontSize: 14,
-    boxSizing: "border-box", // 🔑 CLAVE
-  },
-
-  input: {
-    width: "100%",
-    maxWidth: "100%",
-    borderRadius: 12,
-    padding: "12px 14px",
-    border: "1px solid rgba(255,255,255,0.15)",
-    background: "rgba(3,7,18,0.6)",
-    color: "white",
-    outline: "none",
-    marginBottom: 12,
-    fontSize: 14,
-    boxSizing: "border-box", // 🔑 CLAVE
-  },
-
-  file: {
-    color: "#cbd5e1",
-  },
-
-  error: {
-    background: "rgba(239,68,68,0.15)",
-    border: "1px solid rgba(239,68,68,0.4)",
-    padding: 10,
-    borderRadius: 12,
-    color: "#fecaca",
-    marginBottom: 10,
-    fontSize: 13,
-  },
-
-  btn: {
-    width: "100%",
-    border: "none",
-    borderRadius: 12,
-    padding: 12,
-    background: "rgb(59,130,246)",
-    color: "white",
-    fontWeight: 700,
-    cursor: "pointer",
   },
 };
+
