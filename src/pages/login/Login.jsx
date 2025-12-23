@@ -20,10 +20,10 @@ export default function Login() {
   // REGISTER (modal)
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [regEmail, setRegEmail] = useState("");
-  const [regName, setRegName] = useState('')
-  const [regLastname, setRegLastname] = useState('')
-  const [regAlias, setRegAlias] = useState('')
-  const [regBirthdate, setRegBirthdate] = useState(new Date())
+  const [regName, setRegName] = useState("");
+  const [regLastname, setRegLastname] = useState("");
+  const [regAlias, setRegAlias] = useState("");
+  const [regBirthdate, setRegBirthdate] = useState(new Date());
   const [regPassword, setRegPassword] = useState("");
   const [regConfirm, setRegConfirm] = useState("");
   const [regError, setRegError] = useState("");
@@ -65,7 +65,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const data = await login({ password, email })
+      const data = await login({ password, email });
       const token = getTokenFromResponse(data);
 
       if (!token) {
@@ -73,14 +73,14 @@ export default function Login() {
           "El backend no devolvió token. Ajusta la respuesta a { access_token }."
         );
       }
-      localStorage.setItem('user_id', data.id)
+      localStorage.setItem("user_id", data.id);
       localStorage.setItem("access_token", token);
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      console.log('error login', err.message);
-      
-      if(err?.message == 'USER_NOT_FOUND') {
-        setError('Este usuario no existe, regístrese por favor');
+      console.log("error login", err.message);
+
+      if (err?.message == "USER_NOT_FOUND") {
+        setError("Este usuario no existe, regístrese por favor");
       }
       // setError(err?.message ?? "Error desconocido");
     } finally {
@@ -109,8 +109,8 @@ export default function Login() {
         regLastname,
         regAlias,
         regBirthdate,
-        regPassword
-      })
+        regPassword,
+      });
       const token = getTokenFromResponse(data);
 
       // Si tu register NO devuelve token, te dejo fallback:
@@ -207,7 +207,7 @@ export default function Login() {
             onMouseDown={(e) => e.stopPropagation()}
           >
             <div style={styles.modalHeader}>
-              <h2 style={{ margin: 0 }}>Crear cuenta</h2>
+              <h2 style={{ margin: 6 }}>Crear cuenta</h2>
               <button
                 type="button"
                 onClick={closeRegister}
@@ -218,7 +218,7 @@ export default function Login() {
               </button>
             </div>
 
-            <form onSubmit={handleRegisterSubmit} style={styles.form}>
+            <form onSubmit={handleRegisterSubmit} style={styles.modalBody}>
               <label style={styles.label}>
                 Nombre
                 <input
@@ -313,19 +313,22 @@ export default function Login() {
                   minLength={6}
                 />
               </label>
-
-              <button
-                type="submit"
-                disabled={!canRegister || loading}
-                style={{
-                  ...styles.button,
-                  opacity: !canRegister || loading ? 0.7 : 1,
-                  cursor: !canRegister || loading ? "not-allowed" : "pointer",
-                }}
-              >
-                {loading ? "Registrando..." : "Crear cuenta"}
-              </button>
-              {regError && <div style={styles.error}>{regError}</div>}
+              <div style={styles.modalFooter}>
+                <button
+                  type="submit"
+                  disabled={!canRegister || loading}
+                  style={{
+                    ...styles.button,
+                    opacity: !canRegister || loading ? 0.7 : 1,
+                    cursor: !canRegister || loading ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {loading ? "Registrando..." : "Crear cuenta"}
+                </button>
+                <div style={{ textAlign: "center", marginTop: 8 }}>
+                  {regError && <div style={styles.error}>{regError}</div>}
+                </div>
+              </div>
               <div style={{ textAlign: "center", marginTop: 8 }}>
                 <button
                   type="button"
@@ -363,7 +366,12 @@ const styles = {
     color: "white",
   },
   title: { margin: 0, fontSize: 26, fontWeight: 800, textAlign: "center" },
-  subtitle: { marginTop: 10, marginBottom: 18, opacity: 0.85, textAlign: "center" },
+  subtitle: {
+    marginTop: 10,
+    marginBottom: 18,
+    opacity: 0.85,
+    textAlign: "center",
+  },
   form: { display: "grid", gap: 14 },
   label: { display: "grid", gap: 6, fontSize: 14 },
   input: {
@@ -406,30 +414,29 @@ const styles = {
     cursor: "pointer",
     textDecoration: "underline",
   },
-
-  modalOverlay: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.55)",
-    display: "grid",
-    placeItems: "center",
-    padding: 16,
-  },
   modalCard: {
     width: "100%",
     maxWidth: 520,
-    background: "#0f1930",
-    border: "1px solid rgba(255,255,255,0.10)",
+    background: "rgba(15,23,42,0.92)",
+    border: "1px solid rgba(255,255,255,0.12)",
     borderRadius: 18,
-    padding: 18,
-    color: "white",
-    boxShadow: "0 18px 50px rgba(0,0,0,0.5)",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
+    maxHeight: "calc(100vh - 32px)", // 🔥 no se sale de pantalla
+    overflow: "hidden", // para que el header/footer sticky funcionen
+    display: "flex",
+    flexDirection: "column",
   },
   modalHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
+    marginRight: 6,
+    marginTop: 3,
+  },
+  modalBody: {
+    padding: 18,
+    overflowY: "auto", // 🔥 aquí scrollean los inputs
   },
   iconButton: {
     border: "1px solid rgba(255,255,255,0.18)",
@@ -446,5 +453,22 @@ const styles = {
     textDecoration: "underline",
     cursor: "pointer",
     fontWeight: 700,
+  },
+  modalOverlay: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.55)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+    overflowY: "auto", // 🔥 permite scroll si no cabe
+  },
+  modalFooter: {
+    padding: 18,
+    borderTop: "1px solid rgba(255,255,255,0.08)",
+    background: "rgba(15,23,42,0.95)",
+    position: "sticky",
+    bottom: 0,
   },
 };
