@@ -22,8 +22,17 @@ El sistema está compuesto por:
 - **Frontend:** React + Vite
 - **Base de datos:** PostgreSQL
 - **Infraestructura:** Docker
+---
 
+## 🧩 Arquitectura del Frontend
 
+El frontend está construido con **React** y sigue una **arquitectura modular orientada a funcionalidades (Feature-based Architecture)**.
+
+La aplicación se organiza por dominios funcionales, permitiendo:
+- Escalabilidad
+- Separación de responsabilidades
+- Mantenimiento sencillo
+- Alineación con el backend
 ---
 
 # 🔧 Frontend – React.js
