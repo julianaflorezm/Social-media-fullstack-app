@@ -37,41 +37,33 @@ export default function Dashboard() {
 
   return (
     <div style={styles.page}>
+      {/* Avatar global */}
+      <div style={styles.avatarWrapper}>
+        <div
+          style={styles.avatar}
+          onClick={() => setOpen((v) => !v)}
+          title="Cuenta"
+        >
+          👤
+        </div>
+
+        {open && (
+          <div style={styles.dropdown}>
+            <div style={styles.item} onClick={() => navigate("/profile")}>
+              👤 Mi perfil
+            </div>
+            <div style={{ ...styles.item, color: "#f87171" }} onClick={logout}>
+              🚪 Cerrar sesión
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Contenido */}
       <div style={styles.container}>
         <h2 style={styles.title}>Publicaciones</h2>
-
-        <div style={styles.avatarWrapper}>
-          <div
-            style={styles.avatar}
-            onClick={() => setOpen((v) => !v)}
-            title="Cuenta"
-          >
-            👤
-          </div>
-
-          {open && (
-            <div style={styles.dropdown}>
-              <div style={styles.item} onClick={() => navigate("/profile")}>
-                👤 Mi perfil
-              </div>
-              <div
-                style={{ ...styles.item, color: "#f87171" }}
-                onClick={logout}
-              >
-                🚪 Cerrar sesión
-              </div>
-            </div>
-          )}
-        </div>
         <CreatePostCard onCreate={handleCreate} />
-
-        <div style={{ height: 16 }} />
-
-        {loading ? (
-          <p style={{ color: "#cbd5e1" }}>Cargando...</p>
-        ) : (
-          <PostList posts={posts} />
-        )}
+        <PostList posts={posts} />
       </div>
     </div>
   );
@@ -80,7 +72,8 @@ export default function Dashboard() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "radial-gradient(circle at top, #0b1220 0%, #060b14 60%, #050812 100%)",
+    background:
+      "radial-gradient(circle at top, #0b1220 0%, #060b14 60%, #050812 100%)",
     padding: "28px 16px",
   },
 
@@ -102,36 +95,34 @@ const styles = {
 
   // ✅ avatar queda SIEMPRE arriba derecha del header
   avatarWrapper: {
-    position: "absolute",
-    right: 0,
-    top: "50%",
-    transform: "translateY(-50%)",
+    position: "fixed", // ⬅️ CLAVE
+    top: 20,
+    right: 20,
+    zIndex: 1000,
   },
 
   avatar: {
-    width: 38,
-    height: 38,
+    width: 42,
+    height: 42,
     borderRadius: "50%",
     background: "linear-gradient(135deg, #e5e7eb, #e5e7eb)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: "white",
-    
     cursor: "pointer",
     userSelect: "none",
+    fontSize: 18,
   },
 
   dropdown: {
     position: "absolute",
-    top: 46,
+    top: 50,
     right: 0,
     background: "rgba(15,23,42,0.95)",
     border: "1px solid rgba(255,255,255,0.12)",
     borderRadius: 12,
-    overflow: "hidden",
     minWidth: 160,
-    zIndex: 10,
+    overflow: "hidden",
   },
 
   item: {
@@ -141,4 +132,3 @@ const styles = {
     fontSize: 14,
   },
 };
-
