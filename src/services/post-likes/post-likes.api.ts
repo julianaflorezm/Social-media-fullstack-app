@@ -21,7 +21,6 @@ export async function toggleLike({
     
     
   const token = getToken();
-  console.log('POST ID', postId,'USER ID', userId);
   const res = await fetch(`${API}/post-likes`, {
     method: "POST",
     headers: {

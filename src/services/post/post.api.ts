@@ -21,13 +21,6 @@ export async function createPost({
   caption,
   source, // File | null (solo si image)
 }: CreatePostPayload) {
-  console.log({
-    authorId,
-    type, // "image" | "text"
-    textContent,
-    caption,
-    source, // File | null (solo si image)
-  });
 
   const token = getToken();
   const form = new FormData();
