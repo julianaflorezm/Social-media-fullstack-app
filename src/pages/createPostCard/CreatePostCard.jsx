@@ -20,11 +20,13 @@ export default function CreatePostCard({ onCreate }) {
     setSubmitting(true);
     try {
       if (type === PostType.TEXT) {
+        console.log(textContent.trim());
+        
         await onCreate({
           authorId: Number(localStorage.getItem('user_id')),
           type: PostType.TEXT,
           textContent: textContent.trim(),
-          caption: caption.trim() || null,
+          caption: caption && caption.trim() || null,
         });
         setTextContent("");
         setCaption("");

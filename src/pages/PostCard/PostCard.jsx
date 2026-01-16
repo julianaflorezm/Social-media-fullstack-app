@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PostType } from "../../services/post/post";
 import { getUser } from "../../services/user/user.api";
 import { countLike, toggleLike } from "../../services/post-likes/post-likes.api";
+import { updatePost } from "../../services/post/post.api";
 // IMPORTA tu api de likes (ajusta el path y el nombre)
 // import { toggleLike } from "../../services/likes/likes.api";
 
@@ -13,9 +14,15 @@ export default function PostCard({ post, onLikeToggled }) {
   const [likeCount, setLikeCount] = useState(post?.likeCount ?? 0);
   const [liked, setLiked] = useState(!!post?.likedByMe); // si tu backend lo manda
   const [liking, setLiking] = useState(false);
-
+  const [type, setType] = useState(post?.type); // text | image
+  const [textContent, setTextContent] = useState(post?.textContent);
+  const [postId, setPostId] = useState(post?.id);
+  const [caption, setCaption] = useState(post?.caption);
+  const [source, setSource] = useState(post?.source);
+  const [clickUpdate, setClickUpdate] = useState(false);
   // Mantener estado cuando cambie el post (si renderizas lista)
   useEffect(() => {
+    setPostId(post?.id)
     setLikeCount(post?.likeCount ?? 0);
     setLiked(!!post?.likedByMe);
   }, [post?.id, post?.likeCount, post?.likedByMe]);
@@ -75,6 +82,20 @@ export default function PostCard({ post, onLikeToggled }) {
     return new Date(post.createdAt).toLocaleString();
   }, [post?.createdAt]);
 
+  const handleUpdatePost = async () => {
+    setClickUpdate(true);
+  }
+  const handleSavePost = async () => {
+    setClickUpdate(false);
+    await updatePost({
+      id: postId,
+      authorId: Number(localStorage.getItem('user_id')),
+      type: PostType.TEXT,
+      textContent: textContent.trim(),
+      caption: caption && caption.trim() || null,
+    })
+    setClickUpdate(false)
+  }
   // ✅ Like handler (optimistic)
   const handleToggleLike = async () => {
     if (!post?.id || liking) return;
@@ -114,21 +135,31 @@ export default function PostCard({ post, onLikeToggled }) {
       <div style={styles.header}>
         <div style={styles.left}>
           <div style={styles.author}>{authorName}</div>
-          <span style={styles.type}>{post?.type?.toUpperCase()}</span>
+          <span style={styles.type}>{type}</span>
         </div>
 
         <span style={styles.date}>{createdAtLabel}</span>
       </div>
 
-      {post?.caption && <div style={styles.caption}>{post.caption}</div>}
-
-      {post?.type === PostType.IMAGE ? (
-        <img src={post.source} alt="post" style={styles.image} />
-      ) : (
-        <p style={styles.text}>{post?.textContent}</p>
+      {caption && !clickUpdate && <div style={styles.caption}>{caption}</div>}
+      {/* {!caption && clickUpdate && <input value={caption} style={styles.caption}/>} */}
+      {type === PostType.IMAGE && !clickUpdate ? (
+        <img src={source} alt="post" style={styles.image} />
+      ) : !clickUpdate && (
+        <p style={styles.text}>{textContent}</p>
       )}
 
+      {type === PostType.TEXT && clickUpdate && (
+        <input value={textContent} style={styles.text} onChange={(e) => setTextContent(e.target.value)}/>
+      )}
       <div style={styles.footer}>
+
+        {!clickUpdate && localStorage.getItem('user_id') == post.authorId && <button type="button" style={styles.footerBtn} onClick={handleUpdatePost}>
+          Editar post
+        </button>}
+        {clickUpdate && <button type="button" style={styles.footerBtn} onClick={handleSavePost}>
+          guardar
+        </button>}
         <button type="button" style={styles.footerBtn}>
           💬 {post?.commentCount ?? 0}
         </button>

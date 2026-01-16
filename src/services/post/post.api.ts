@@ -1,4 +1,4 @@
-import { CreatePostPayload, PostType } from "./post";
+import { CreatePostPayload, PostType, UpdatePostPayload } from "./post";
 
 const API = "http://localhost:8080";
 
@@ -35,9 +35,47 @@ export async function createPost({
   if (type === PostType.IMAGE && source) {
     form.append("source", source);
   }
-
   const res = await fetch(`${API}/post`, {
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // NO pongas Content-Type aquí. El browser lo setea con boundary.
+    },
+    body: form,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.message || "Error creando post");
+  }
+
+  return await res.json();
+}
+
+export async function updatePost({
+  id,
+  authorId,
+  type, // "image" | "text"
+  textContent,
+  caption,
+  source, // File | null (solo si image)
+}: UpdatePostPayload) {
+
+  const token = getToken();
+  const form = new FormData();  
+  form.append('id', String(id))
+  form.append("authorId", String(authorId));
+  form.append("type", type);
+
+  if (caption) form.append("caption", caption);
+  if (textContent) form.append("textContent", textContent);
+
+  // IMPORTANTE: la key debe ser "source" porque FileInterceptor('source')
+  if (type === PostType.IMAGE && source) {
+    form.append("source", source);
+  }
+
+  const res = await fetch(`${API}/post`, {
+    method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
       // NO pongas Content-Type aquí. El browser lo setea con boundary.
